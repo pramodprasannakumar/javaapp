@@ -56,7 +56,8 @@ pipeline {
           //def imageName = "pramodprasanna/carwebsitelunch:1.0"
 
           // Build Docker image
-          sh "docker build -f carwebsite -t ${imageName} ."
+          sh "docker build -f carwebsite --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin12 -t carpage:1.0 ."
+         // sh "docker build -f carwebsite -t ${imageName} ."
 
           // Push Docker image to Docker Hub
           withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials-id',
