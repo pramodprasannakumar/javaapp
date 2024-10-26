@@ -69,7 +69,7 @@ environment {
           //def imageName = "pramodprasanna/carwebsitelunch:1.0"
 
           // Build Docker image
-          sh "docker build -f carbooking --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin12 -t carbookingpage:1.1 ."
+          sh "docker build -f /root/carbooking --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin12 -t carbookingpage:1.1 ."
          // sh "docker build -f carwebsite -t ${imageName} ."
 
           // Push Docker image to Docker Hub
