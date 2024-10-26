@@ -69,7 +69,7 @@ environment {
           //def imageName = "pramodprasanna/carwebsitelunch:1.0"
 
           // Build Docker image
-          sh "docker build -f carwebsite --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin12 -t carpage:1.1 ."
+          sh "docker build -f carbooking --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin12 -t carbookingpage:1.1 ."
          // sh "docker build -f carwebsite -t ${imageName} ."
 
           // Push Docker image to Docker Hub
@@ -81,7 +81,7 @@ environment {
       //    }
 
           // Deploy Docker image to container
-          sh "docker run -d -p 8080:8080 --name carpage_container carpage:1.1"
+          sh "docker run -d -p 8080:8080 --name carpage_container carbookingpage:1.1"
           //sh "docker run -d --name carwebsitelunch -p 8080:8080 ${imageName}"
         }
       }
