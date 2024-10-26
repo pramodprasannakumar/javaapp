@@ -86,12 +86,5 @@ environment {
         }
       }
     }
-  
-  post {
-    always {
-      echo 'Cleaning up...'
-      cleanWs()
-    }
-  }
 }
 }
