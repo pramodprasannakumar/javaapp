@@ -61,7 +61,6 @@ environment {
       }
     }
 
-    // New Docker build, push, and deploy stage
     stage('Docker Build, Push, and Deploy') {
       agent { label 'docker_boat' }  
       steps {
