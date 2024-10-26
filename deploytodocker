@@ -50,7 +50,7 @@ pipeline {
 
     // New Docker build, push, and deploy stage
     stage('Docker Build, Push, and Deploy') {
-      agent { label 'Docker_ship' }  
+      agent { label 'docker_boat' }  
       steps {
         script {
           //def imageName = "pramodprasanna/carwebsitelunch:1.0"
@@ -60,7 +60,7 @@ pipeline {
          // sh "docker build -f carwebsite -t ${imageName} ."
 
           // Push Docker image to Docker Hub
-          withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials-id',
+          withCredentials([usernamePassword(credentialsId: 'docker_hubpass',
                                             usernameVariable: 'DOCKER_USER',
                                             passwordVariable: 'DOCKER_PASSWORD')]) {
             sh "docker login -u $DOCKER_USER -p $DOCKER_PASSWORD"
@@ -68,7 +68,8 @@ pipeline {
           }
 
           // Deploy Docker image to container
-          sh "docker run -d --name carwebsitelunch -p 8080:8080 ${imageName}"
+          sh "docker run -d -p 8080:8080 --name carpage_container carpage:1.0"
+          //sh "docker run -d --name carwebsitelunch -p 8080:8080 ${imageName}"
         }
       }
     }
