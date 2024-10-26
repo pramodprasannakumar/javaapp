@@ -50,13 +50,13 @@ pipeline {
 
     // New Docker build, push, and deploy stage
     stage('Docker Build, Push, and Deploy') {
-      agent { label 'docker-node' }  // Ensure 'docker-node' is the label of the Docker-enabled node
+      agent { label 'Docker_ship' }  
       steps {
         script {
-          def imageName = "pramodprasanna/carwebsitelunch:1.0"
+          //def imageName = "pramodprasanna/carwebsitelunch:1.0"
 
           // Build Docker image
-          sh "docker build -f Dockerfile -t ${imageName} ."
+          sh "docker build -f carwebsite -t ${imageName} ."
 
           // Push Docker image to Docker Hub
           withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials-id',
