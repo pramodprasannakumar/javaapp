@@ -2,6 +2,19 @@ pipeline {
   agent {
     label "java"
   }
+environment {
+    EMAIL_RECIPIENTS = 'pramodprasanna17@gmail.com'
+    PATH = "/opt/apache-maven-3.9.2/bin:${PATH}"
+    NEXUS_URL = 'http://44.207.0.8:8081/repository/maven-releases/'
+    NEXUS_CREDENTIALS = credentials('jenkins-nexus') // Jenkins credentials for Nexus
+    GROUP_ID = 'com.maven'
+    ARTIFACT_ID = 'SimpleWebApplication'
+    VERSION = '9.1.14'
+    NEXUSUSER_NAME = 'admin'
+    NEXUS_PASSWORD = 'admin12'
+    DOCKER_USER = 'pramodprasanna'
+    DOCKER_PASSWORD = 'Pramoddoc12'
+  }
   stages {
     stage('Build') {
       steps {
@@ -44,7 +57,7 @@ pipeline {
     stage('Upload to Nexus') {
       steps {
         nexusArtifactUploader artifacts: [[artifactId: 'SimpleWebApplication', classifier: '', file: 'target/SimpleWebApplication.war', type: 'war']],
-        credentialsId: 'jenkins-nexus', groupId: 'com.maven', nexusUrl: '100.24.43.221:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-releases', version: '1.0.0'
+        credentialsId: 'jenkins-nexus', groupId: 'com.maven', nexusUrl: '44.207.0.8:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-releases', version: '1.0.0'
       }
     }
 
@@ -56,28 +69,29 @@ pipeline {
           //def imageName = "pramodprasanna/carwebsitelunch:1.0"
 
           // Build Docker image
-          sh "docker build -f carwebsite --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin12 -t carpage:1.0 ."
+          sh "docker build -f carwebsite --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin12 -t carpage:1.1 ."
          // sh "docker build -f carwebsite -t ${imageName} ."
 
           // Push Docker image to Docker Hub
-          withCredentials([usernamePassword(credentialsId: 'docker_hubpass',
-                                            usernameVariable: 'DOCKER_USER',
-                                            passwordVariable: 'DOCKER_PASSWORD')]) {
-            sh "docker login -u $DOCKER_USER -p $DOCKER_PASSWORD"
-            sh "docker push ${imageName}"
-          }
+       //   withCredentials([usernamePassword(credentialsId: 'docker_hubpass',
+         //                                   usernameVariable: 'DOCKER_USER',
+           //                                 passwordVariable: 'DOCKER_PASSWORD')]) {
+            //sh "docker login -u $DOCKER_USER -p $DOCKER_PASSWORD"
+            //sh "docker push ${imageName}"
+      //    }
 
           // Deploy Docker image to container
-          sh "docker run -d -p 8080:8080 --name carpage_container carpage:1.0"
+          sh "docker run -d -p 8080:8080 --name carpage_container carpage:1.1"
           //sh "docker run -d --name carwebsitelunch -p 8080:8080 ${imageName}"
         }
       }
     }
-  }
+  
   post {
     always {
       echo 'Cleaning up...'
       cleanWs()
     }
   }
+}
 }
