@@ -81,7 +81,7 @@ environment {
       //    }
 
           // Deploy Docker image to container
-          sh "docker run -d -p 8080:8080 --name carpage_container carbookingpage:1.1"
+          sh "docker run -d -p 8080:8080 --name carpage_containerjenkins carbookingpage:1.1"
           //sh "docker run -d --name carwebsitelunch -p 8080:8080 ${imageName}"
         }
       }
