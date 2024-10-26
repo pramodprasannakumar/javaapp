@@ -57,7 +57,7 @@ environment {
     stage('Upload to Nexus') {
       steps {
         nexusArtifactUploader artifacts: [[artifactId: 'SimpleWebApplication', classifier: '', file: 'target/SimpleWebApplication.war', type: 'war']],
-        credentialsId: 'jenkins-nexus', groupId: 'com.maven', nexusUrl: '44.207.0.8:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-releases', version: '1.0.0'
+        credentialsId: 'jenkins-nexus', groupId: 'com.maven', nexusUrl: '44.207.0.8:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-releases', version: '9.1.14'
       }
     }
 
