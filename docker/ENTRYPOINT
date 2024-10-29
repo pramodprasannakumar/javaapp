@@ -1,0 +1,19 @@
+FROM ubuntu
+
+RUN apt-get update -y && apt install openjdk-17-jdk wget tar vim -y && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /home/tomcat
+RUN useradd -d /home/tomcat -s /bin/bash tomcat
+WORKDIR /home/tomcat
+
+ADD https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.96/bin/apache-tomcat-9.0.96.tar.gz /home/tomcat/
+RUN tar -xvf apache-tomcat-9.0.96.tar.gz && rm -rf apache-tomcat-9.0.96.tar.gz
+
+# Uncomment these lines if you want to copy your context.xml and tomcat-user.xml
+#COPY /root/context.xml /home/tomcat/apache-tomcat-9.0.96/webapps/manager/META-INF/context.xml
+#COPY /root/tomcat-user.xml /home/tomcat/apache-tomcat-9.0.96/conf/tomcat-user.xml
+
+USER tomcat
+EXPOSE 8080
+
+ENTRYPOINT ["/home/tomcat/apache-tomcat-9.0.96/bin/catalina.sh"]
+CMD ["run"]
