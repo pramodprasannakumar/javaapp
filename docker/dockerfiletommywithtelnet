@@ -1,0 +1,27 @@
+FROM ubuntu:latest
+
+RUN apt-get update -y && \
+    apt-get install -y openjdk-11-jdk tar gzip findutils telnet iputils-ping && \
+    mkdir -p /home/tomcat && \
+    useradd -d /home/tomcat -s /bin/bash tomcat
+
+WORKDIR /home/tomcat
+
+ADD https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.31/bin/apache-tomcat-10.1.31.tar.gz /home/tomcat
+
+RUN tar -zvxf apache-tomcat-10.1.31.tar.gz && \
+    mkdir -p /home/tomcat/apache-tomcat-10.1.31/webapps/backup && \
+    chmod -R 777 /home/tomcat && \
+    chown -R tomcat:tomcat /home/tomcat
+
+USER tomcat
+EXPOSE 9090
+CMD ["/home/tomcat/apache-tomcat-10.1.31/bin/catalina.sh", "run"]
+
+
+
+
+
+commands:
+docker run -d -p 9090:8080 tommy:1.1
+http://54.224.166.79:9090/   so i can access tomcat page in 9090 port
