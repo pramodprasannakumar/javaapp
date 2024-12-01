@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexus-deployment
+  labels:
+    app: nexus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nexus
+  template:
+    metadata:
+      labels:
+        app: nexus
+    spec:
+      containers:
+      - name: nexus
+        image: sonatype/nexus:latest
+        ports:
+        - containerPort: 8081
+        - containerPort: 8082
+        - containerPort: 8083
+        volumeMounts:
+        - name: nexus-data
+          mountPath: /nexus-data
+        - name: nexus-etc
+          mountPath: /etc/nexus
+        securityContext:
+          runAsUser: 200
+          fsGroup: 200
+      volumes:
+      - name: nexus-data
+        persistentVolumeClaim:
+          claimName: nexus-data-pvc
+      - name: nexus-etc
+        configMap:
+          name: nexus-config
+  strategy:
+    type: Recreate
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nexus-config
+data:
+  nexus.properties: |
+    # Nexus configuration properties
+    application-port=8081
+    application-host=0.0.0.0
+    context-path=/    
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nexus-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
