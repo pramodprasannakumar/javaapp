@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarqube-prod
+  namespace: sonarqube
+  labels:
+    app: sonarqube
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarqube
+  template:
+    metadata:
+      labels:
+        app: sonarqube
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: env
+                operator: In
+                values:
+                - prod
+      containers:
+      - name: sonarqube
+        image: sonarqube:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            cpu: 2000m
+            memory: 2048Mi
+        env:
+        - name: SONARQUBE_DB_USERNAME
+          value: "sonar"
+        - name: SONARQUBE_DB_PASSWORD
+          value: "sonar"
+        - name: SONARQUBE_DB_URL
+          value: "jdbc:postgresql://sonarqube-postgres/sonar"
+        - name: SONARQUBE_WEB_CONTEXT
+          value: "/sonarqube"
+        - name: SONARQUBE_WEB_HOST
+          value: "sonarqube.example.com"
+        - name: SONARQUBE_WEB_PORT
+          value: "443"
+        - name: SONARQUBE_WEB_SECURE
+          value: "true"
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: sonarqube-data
+          mountPath: /opt/sonarqube/data
+        - name: sonarqube-logs
+          mountPath: /opt/sonarqube/logs
+        livenessProbe:
+          httpGet:
+            path: /sonarqube
+            port: 9000
+          initialDelaySeconds: 300
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /sonarqube
+            port: 9000
+          initialDelaySeconds: 300
+          periodSeconds: 10
+      nodeSelector:
+        env: prod
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      volumes:
+      - name: sonarqube-data
+        persistentVolumeClaim:
+          claimName: sonarqube-data-pvc
+      - name: sonarqube-logs
+        persistentVolumeClaim:
+          claimName: sonarqube-logs-pvc
