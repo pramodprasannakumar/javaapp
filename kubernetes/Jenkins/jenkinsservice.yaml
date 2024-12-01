@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins
+spec:
+  selector:
+    app: jenkins
+  ports:
+    - name: http
+      nodePort:
+      port: 80
+      targetPort: 8080  # assuming Jenkins is running on port 8080 inside the pod
+  type: NodePort  # Keep it as ClusterIP
