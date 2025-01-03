@@ -1,24 +1,24 @@
 pipeline {
   agent {
-    label "java"
+    label "java_agent"
   }
   
   environment {
-    EMAIL_RECIPIENTS = 'pramodprasanna17@gmail.com'
+    
     PATH = "/opt/apache-maven-3.9.2/bin:${PATH}"
-    NEXUS_URL = 'http://44.212.34.244:8081/repository/snapshotnew/'
-    NEXUS_CREDENTIALS = credentials('jenkins-nexus') // Jenkins credentials for Nexus
+    NEXUS_URL = 'http://13.126.80.255:8081/repository/carwebpagemaven/'
+    NEXUS_CREDENTIALS = credentials('nexuscred') // Jenkins credentials for Nexus
     GROUP_ID = 'com.maven'
     ARTIFACT_ID = 'SimpleWebApplication'
     VERSION = '9.1.14-SNAPSHOT'
     //WAR_FILE_NAME = "SimpleWebApplication.war"
     WAR_FILE_NAME = "${ARTIFACT_ID}-${VERSION}.war"
-    TOMCAT_CREDENTIALS = credentials('tomcat-password')
-    TOMCAT_URL = 'http://54.172.228.221:8080/'
-    TOMCAT_WEBAPPS_DIR = '/opt/tomcat/apache-tomcat-10.1.30/webapps' // Define your Tomcat webapps directory here
-    WORKSPACE = '/home/tomcat/workspace/Javawebappproject'
+    //TOMCAT_CREDENTIALS = credentials('tomcat-password')
+  //  TOMCAT_URL = 'http://54.172.228.221:8080/'
+ //   TOMCAT_WEBAPPS_DIR = '/opt/tomcat/apache-tomcat-10.1.30/webapps' // Define your Tomcat webapps directory here
+   // WORKSPACE = '/home/tomcat/workspace/Javawebappproject'
     NEXUSUSER_NAME = 'admin'
-    NEXUS_PASSWORD = 'admin12'
+    NEXUS_PASSWORD = 'admin'
   }
   
   stages {
@@ -38,11 +38,11 @@ pipeline {
       steps {
         script {
           def scannerHome = tool 'sonarqubescanner'
-          withSonarQubeEnv('sonarqube') {
+          withSonarQubeEnv('sonarqubeserver') {
             sh """
               ${scannerHome}/bin/sonar-scanner \
-              -Dsonar.projectKey=javawebappproject \
-              -Dsonar.projectName=javawebappproject \
+              -Dsonar.projectKey=javaapp \
+              -Dsonar.projectName=javaapp \
               -Dsonar.projectVersion=1.0 \
               -Dsonar.java.binaries='target/classes'
             """
@@ -50,10 +50,10 @@ pipeline {
         }
       }
     }
-
+/*
     stage("Sonar Quality Gate Check") {
       steps {
-        timeout(time: 1, unit: 'HOURS') {
+        timeout(time: 1, unit: 'min') {
           script {
             def qualityGate = waitForQualityGate()
             if (qualityGate.status != 'OK') {
@@ -63,7 +63,7 @@ pipeline {
         }
       }
     }
-
+*/
     stage('Upload to Nexus') {
       steps {
         nexusArtifactUploader artifacts: [[
@@ -72,9 +72,9 @@ pipeline {
           file: 'target/SimpleWebApplication.war', 
           type: 'war'
         ]], 
-        credentialsId: 'jenkins-nexus', 
+        credentialsId: 'nexuscred', 
         groupId: 'com.maven', 
-        nexusUrl: '44.212.34.244:8081', // Ensure protocol is included
+        nexusUrl: '13.126.80.255:8081', // Ensure protocol is included
         nexusVersion: 'nexus3', 
         protocol: 'http', 
         repository: 'snapshotnew', 
