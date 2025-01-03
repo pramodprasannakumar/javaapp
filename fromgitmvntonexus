@@ -5,7 +5,7 @@ pipeline {
   
   environment {
     
-    PATH = "/opt/apache-maven-3.9.2/bin:${PATH}"
+    PATH = "/opt/apache-maven-3.9.9/bin:${PATH}"
     NEXUS_URL = 'http://13.126.80.255:8081/repository/carwebpagemaven/'
     NEXUS_CREDENTIALS = credentials('nexuscred') // Jenkins credentials for Nexus
     GROUP_ID = 'com.maven'
