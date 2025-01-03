@@ -50,10 +50,10 @@ pipeline {
         }
       }
     }
-/*
+
     stage("Sonar Quality Gate Check") {
       steps {
-        timeout(time: 1, unit: 'min') {
+        timeout(time: 1, unit: 'sec') {
           script {
             def qualityGate = waitForQualityGate()
             if (qualityGate.status != 'OK') {
@@ -63,7 +63,7 @@ pipeline {
         }
       }
     }
-*/
+
     stage('Upload to Nexus') {
       steps {
         nexusArtifactUploader artifacts: [[
