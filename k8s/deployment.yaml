@@ -1,1 +1,20 @@
-
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mercedez
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mercedez
+  template:
+    metadata:
+      labels:
+        app: mercedez
+    spec:
+      containers:
+      - name: mercedez
+        image: 43.205.119.33:5000/mercedezcar/mercedez:1.1
+        ports:
+        - containerPort: 8080
