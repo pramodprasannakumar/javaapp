@@ -17,4 +17,4 @@ spec:
       - name: mercedez
         image: 43.205.119.33:5000/mercedezcar/mercedez:1.1
         ports:
-        - containerPort: 8080
+        - containerPort: 80
