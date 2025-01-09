@@ -6,7 +6,7 @@ pipeline {
   environment {
     
     PATH = "/apache-maven-3.9.9/bin:${env.PATH}"
-    NEXUS_URL = 'http://13.126.80.255:8081/repository/carwebpagemaven/'
+    NEXUS_URL = 'http://52.66.116.134:8081/repository/carwebpagemaven/'
     NEXUS_CREDENTIALS = credentials('nexuscred') // Jenkins credentials for Nexus
     GROUP_ID = 'com.maven'
     ARTIFACT_ID = 'SimpleWebApplication'
@@ -74,7 +74,7 @@ pipeline {
         ]], 
         credentialsId: 'nexuscred', 
         groupId: 'com.maven', 
-        nexusUrl: '13.126.80.255:8081', // Ensure protocol is included
+        nexusUrl: '52.66.116.134:8081', // Ensure protocol is included
         nexusVersion: 'nexus3', 
         protocol: 'http', 
         repository: 'carwebpagemaven', 
