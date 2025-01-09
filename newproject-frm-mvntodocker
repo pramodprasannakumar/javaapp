@@ -91,7 +91,7 @@ stage('Docker Build, Push, and Deploy') {
         cd /etc/docker/
         pwd
         ll
-        sudo docker build -f /etc/docker/benzcar -t benzcarpage:1.2 .
+        sudo docker build -f /root/benzcar -t benzcarpage:1.2 .
         sudo docker run -d -p 8080:8080 --name benzcarpage_container1 benzcarpage:1.2
         sudo docker images
         sudo docker login 52.66.116.134:5001 -u username -p password
