@@ -87,7 +87,9 @@ stage('Docker Build, Push, and Deploy') {
   steps {
     script {
       sh 'cd /etc/docker'
-      sh 'sudo docker buildx build --load -t benzcarpage:1.2 /etc/docker/benzcar .'
+      sh 'll'
+      sh 'docker build -f benzcar --build-arg -t benzcarpage:1.2 .'
+     // sh 'sudo docker buildx build --load -t benzcarpage:1.2 benzcar .'
       sh 'sudo docker run -d -p 8080:8080 --name benzcarpage_container1 benzcarpage:1.2'
       sh 'sudo docker images'
       sh 'sudo docker login 52.66.116.134:5001'
