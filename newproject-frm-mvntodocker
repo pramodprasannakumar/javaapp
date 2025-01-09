@@ -86,20 +86,17 @@ stage('Docker Build, Push, and Deploy') {
   agent { label 'java_agent' }
   steps {
     script {
-      sh 'sudo su'
-      sh 'cd'
-      sh 'pwd'
-      sh 'cd /etc/docker'
-      sh 'll'
-      sh 'pwd'
-      sh 'sudo docker build -f benzcar -t benzcarpage:1.2 .'
-      sh 'pwd'
-     // sh 'sudo docker buildx build --load -t benzcarpage:1.2 benzcar .'
-      sh 'sudo docker run -d -p 8080:8080 --name benzcarpage_container1 benzcarpage:1.2'
-      sh 'sudo docker images'
-      sh 'sudo docker login 52.66.116.134:5001'
-      sh 'sudo docker tag benzcarpage:1.2 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2'
-      sh 'sudo docker push 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2'
+      sh '''
+        sudo su
+        cd /etc/docker/
+        ll
+        sudo docker build -f benzcar -t benzcarpage:1.2 .
+        sudo docker run -d -p 8080:8080 --name benzcarpage_container1 benzcarpage:1.2
+        sudo docker images
+        sudo docker login 52.66.116.134:5001 -u username -p password
+        sudo docker tag benzcarpage:1.2 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2
+        sudo docker push 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2
+      '''
     }
   }
 }
