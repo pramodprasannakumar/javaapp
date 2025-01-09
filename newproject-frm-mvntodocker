@@ -96,4 +96,5 @@ stage('Docker Build, Push, and Deploy') {
         }
       }
     }
+  }
 }
