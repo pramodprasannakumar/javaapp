@@ -89,14 +89,12 @@ stage('Docker Build, Push, and Deploy') {
         script {
        
           // Build Docker image
-          
-        
-
-    
-
-          // Deploy Docker image to container
-         
-         
+          docker build -f benzcar --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin -t benzcarpage:1.2 .
+          docker run -d -p 8080:8080 --name benzcarpage_container1 benzcarpage:1.2
+          docker images
+          docker login 52.66.116.134:5001
+          docker tag benzcarpage:1.2 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2
+          docker push 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2 
         }
       }
     }
