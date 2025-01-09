@@ -86,7 +86,6 @@ stage('Docker Build, Push, and Deploy') {
       agent { label 'java_agent' }  
       steps {
         script {
-       
           // Build Docker image
           docker build -f benzcar --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin -t benzcarpage:1.2 .
           docker run -d -p 8080:8080 --name benzcarpage_container1 benzcarpage:1.2
@@ -97,5 +96,4 @@ stage('Docker Build, Push, and Deploy') {
         }
       }
     }
-}
 }
