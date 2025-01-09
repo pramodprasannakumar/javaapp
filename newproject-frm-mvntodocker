@@ -17,7 +17,7 @@ pipeline {
   //  TOMCAT_URL = 'http://54.172.228.221:8080/'
  //   TOMCAT_WEBAPPS_DIR = '/opt/tomcat/apache-tomcat-10.1.30/webapps' // Define your Tomcat webapps directory here
    // WORKSPACE = '/home/tomcat/workspace/Javawebappproject'
-    NEXUSUSER_NAME = 'admin'
+    NEXUS_USERNAME = 'admin'
     NEXUS_PASSWORD = 'admin'
   }
   
@@ -89,7 +89,7 @@ stage('Docker Build, Push, and Deploy') {
         script {
        
           // Build Docker image
-          docker build -f benzcar --build-arg NEXUSUSER_NAME=admin --build-arg NEXUS_PASSWORD=admin -t benzcarpage:1.2 .
+          docker build -f benzcar --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin -t benzcarpage:1.2 .
           docker run -d -p 8080:8080 --name benzcarpage_container1 benzcarpage:1.2
           docker images
           docker login 52.66.116.134:5001
