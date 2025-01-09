@@ -1,0 +1,25 @@
+stage('Docker Build, Push, and Deploy') {
+      agent { label 'docker_boat' }  
+      steps {
+        script {
+          //def imageName = "pramodprasanna/carwebsitelunch:1.0"
+
+          // Build Docker image
+          sh "docker build -f /root/carbooking --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin12 -t carbookingpage:1.1 ."
+         // sh "docker build -f carwebsite -t ${imageName} ."
+
+          // Push Docker image to Docker Hub
+       //   withCredentials([usernamePassword(credentialsId: 'docker_hubpass',
+         //                                   usernameVariable: 'DOCKER_USER',
+           //                                 passwordVariable: 'DOCKER_PASSWORD')]) {
+            //sh "docker login -u $DOCKER_USER -p $DOCKER_PASSWORD"
+            //sh "docker push ${imageName}"
+      //    }
+
+          // Deploy Docker image to container
+          sh "docker run -d -p 8080:8080 --name carpage_containerjenkins carbookingpage:1.1"
+          //sh "docker run -d --name carwebsitelunch -p 8080:8080 ${imageName}"
+        }
+      }
+    }
+}
