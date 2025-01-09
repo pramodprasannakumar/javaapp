@@ -86,12 +86,12 @@ stage('Docker Build, Push, and Deploy') {
   agent { label 'java_agent' }
   steps {
     script {
-      sh 'docker build -f "benzcar" --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin -t benzcarpage:1.2 .'
-      sh 'docker run -d -p 8080:8080 --name benzcarpage_container1 benzcarpage:1.2'
-      sh 'docker images'
-      sh 'docker login 52.66.116.134:5001'
-      sh 'docker tag benzcarpage:1.2 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2'
-      sh 'docker push 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2'
+      sh 'sudo docker build -f "benzcar" --build-arg NEXUS_USERNAME=admin --build-arg NEXUS_PASSWORD=admin -t benzcarpage:1.2 .'
+      sh 'sudo docker run -d -p 8080:8080 --name benzcarpage_container1 benzcarpage:1.2'
+      sh 'sudo docker images'
+      sh 'sudo docker login 52.66.116.134:5001'
+      sh 'sudo docker tag benzcarpage:1.2 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2'
+      sh 'sudo docker push 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2'
     }
   }
 }
