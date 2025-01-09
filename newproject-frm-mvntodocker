@@ -81,8 +81,7 @@ pipeline {
         version: '9.1.14-SNAPSHOT'
       }
     }
-  }
-}
+
 stage('Docker Build, Push, and Deploy') {
       agent { label 'java_agent' }  
       steps {
@@ -98,4 +97,5 @@ stage('Docker Build, Push, and Deploy') {
         }
       }
     }
+}
 }
