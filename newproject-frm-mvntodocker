@@ -82,18 +82,45 @@ pipeline {
       }
     }
 
-stage('Docker Build, Push, and Deploy') {
-  agent { label 'java_agent' }
+stage('Prepare Docker Build Context') {
   steps {
     script {
-      sh 'sudo docker buildx build --load -t benzcarpage:1.2 benzcar'
-      sh 'sudo docker run -d -p 8080:8080 --name benzcarpage_container1 benzcarpage:1.2'
-      sh 'sudo docker images'
-      sh 'sudo docker login 52.66.116.134:5001'
-      sh 'sudo docker tag benzcarpage:1.2 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2'
-      sh 'sudo docker push 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2'
+      // Verify the benzcar directory exists
+      sh '''
+        if [ ! -d "/etc/docker/benzcar" ]; then
+          echo "Error: Directory /etc/docker/benzcar does not exist!"
+          exit 1
+        fi
+      '''
+
+      // Optionally list the contents for debugging
+      sh 'ls -l /etc/docker/benzcar'
     }
   }
 }
+
+stage('Docker Build, Push, and Deploy') {
+  steps {
+    script {
+      // Build the Docker image using the existing /etc/docker/benzcar directory
+      sh 'sudo docker buildx build --load -t benzcarpage:1.2 /etc/docker/benzcar'
+
+      // Run the Docker container
+      sh 'sudo docker run -d -p 8080:8080 --name benzcarpage_container1 benzcarpage:1.2'
+
+      // Display Docker images
+      sh 'sudo docker images'
+
+      // Log in to the Docker registry
+      sh 'sudo docker login 52.66.116.134:5001'
+
+      // Tag and push the Docker image to the registry
+      sh '''
+        sudo docker tag benzcarpage:1.2 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2
+        sudo docker push 52.66.116.134:5001/repository/benzcarweb/benzcarpage:1.2
+      '''
+    }
   }
+}
+}
 }
