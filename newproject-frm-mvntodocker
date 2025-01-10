@@ -6,17 +6,14 @@ pipeline {
   environment {
     
     PATH = "/apache-maven-3.9.9/bin:${env.PATH}"
-    NEXUS_URL = 'http://52.66.116.134:8081/repository/carwebpagemaven/'
+    NEXUS_URL = 'http://13.233.77.239:8081/repository/carwebpagemaven/'
     NEXUS_CREDENTIALS = credentials('nexuscred') // Jenkins credentials for Nexus
     GROUP_ID = 'com.maven'
     ARTIFACT_ID = 'SimpleWebApplication'
     VERSION = '9.1.14-SNAPSHOT'
-    //WAR_FILE_NAME = "SimpleWebApplication.war"
+  
     WAR_FILE_NAME = "${ARTIFACT_ID}-${VERSION}.war"
-    //TOMCAT_CREDENTIALS = credentials('tomcat-password')
-  //  TOMCAT_URL = 'http://54.172.228.221:8080/'
- //   TOMCAT_WEBAPPS_DIR = '/opt/tomcat/apache-tomcat-10.1.30/webapps' // Define your Tomcat webapps directory here
-   // WORKSPACE = '/home/tomcat/workspace/Javawebappproject'
+
     NEXUS_USERNAME = 'admin'
     NEXUS_PASSWORD = 'admin'
   }
@@ -74,14 +71,14 @@ pipeline {
         ]], 
         credentialsId: 'nexuscred', 
         groupId: 'com.maven', 
-        nexusUrl: '52.66.116.134:8081', // Ensure protocol is included
+        nexusUrl: '13.233.77.239:8081', // Ensure protocol is included
         nexusVersion: 'nexus3', 
         protocol: 'http', 
         repository: 'carwebpagemaven', 
         version: '9.1.14-SNAPSHOT'
       }
     }
-
+/*
 stage('Docker Build, Push, and Deploy') {
   agent { label 'java_agent' }
   steps {
@@ -100,6 +97,6 @@ stage('Docker Build, Push, and Deploy') {
       '''
     }
   }
-}
+} */
 }  
 }
