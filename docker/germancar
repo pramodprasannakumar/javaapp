@@ -19,8 +19,8 @@ RUN tar -xvf apache-tomcat-9.0.98.tar.gz && \
     mv apache-tomcat-9.0.98 tomcat && \
     chown -R tomcat:tomcat /home/tomcat/tomcat
 
-COPY tomcat-users.xml /home/tomcat/apache-tomcat-10.1.34/conf/tomcat-users.xml
-COPY context.xml /home/tomcat/apache-tomcat-10.1.34/webapps/manager/META-INF/context.xml
+COPY tomcat-users.xml /home/tomcat/apache-tomcat-9.0.98/conf/tomcat-users.xml
+COPY context.xml /home/tomcat/apache-tomcat-9.0.98/webapps/manager/META-INF/context.xml
 # Create webapps directory if it doesn't exist
 RUN mkdir -p /home/tomcat/tomcat/webapps
 
