@@ -1,118 +1,127 @@
 pipeline {
-    agent {
-        label "java"
+  agent {
+    label "java"
+  }
+  environment {
+    PATH = "/apache-maven-3.9.9/bin:/usr/bin:/bin:/usr/local/bin"
+  }
+
+  stages {
+
+    // Stage 1: Build the Java Project
+    stage('Build') {
+      steps {
+        sh 'mvn clean install'
+      }
     }
-    environment {
-        PATH = "/apache-maven-3.9.9/bin:/usr/bin:/bin:/usr/local/bin"
+
+    // Stage 2: Code Coverage with JaCoCo
+    stage('Jacoco') {
+      steps {
+        jacoco()
+      }
     }
 
-    stages {
-        stage('Build') {
-            steps {
-                sh 'mvn clean install'
-            }
+    // Stage 3: Static Code Analysis with SonarQube
+    stage('SonarQube Analysis') {
+      steps {
+        script {
+          def scannerHome = tool 'scanner_sonar'
+          withSonarQubeEnv('jenkins-sonar') {
+            sh """
+              ${scannerHome}/bin/sonar-scanner \
+              -Dsonar.projectKey=javawebapp \
+              -Dsonar.projectName=javawebapp \
+              -Dsonar.projectVersion=1.0 \
+              -Dsonar.java.binaries='target/classes'
+            """
+          }
         }
+      }
+    }
 
-        stage('jacoco') {
-            steps {
-                jacoco()
-            }
-        }
+    // Stage 4: Upload WAR File to Nexus Repository
+    stage('Upload to Nexus') {
+      steps {
+        nexusArtifactUploader(
+          artifacts: [[
+            artifactId: 'SimpleWebApplication', 
+            classifier: '', 
+            file: 'target/SimpleWebApplication.war', 
+            type: 'war'
+          ]], 
+          credentialsId: 'nexus', 
+          groupId: 'com.maven', 
+          nexusUrl: '13.233.8.58:8081/', 
+          nexusVersion: 'nexus3', 
+          protocol: 'http', 
+          repository: 'carwebpagemaven', 
+          version: '1.0.0-SNAPSHOT'
+        )
+      }
+    }
 
-        stage('SonarQube analysis') {
-            steps {
-                script {
-                    def scannerHome = tool 'scanner_sonar'
-                    withSonarQubeEnv('jenkins-sonar') {
-                        sh """
-                            ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=javawebapp \
-                            -Dsonar.projectName=javawebapp \
-                            -Dsonar.projectVersion=1.0 \
-                            -Dsonar.java.binaries='target/classes'
-                        """
-                    }
+    // Stage 5: Build Docker Image and Push to Nexus Repository
+    stage('Download Latest WAR from Nexus, Build Docker Image, and Push') {
+      agent {
+        label "docker"
+      }
+      steps {
+        script {
+          def dockerImageName = "mercedez"
+          def dockerRepoUrl = "13.233.8.58:5000/repository/mercedezcar/mercedez"
+
+          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+
+            // Fetch existing tags from Nexus
+            def response = sh(
+              script: """
+                curl -u $DOCKER_USERNAME:$DOCKER_PASSWORD -s \
+                ${dockerRepoUrl}/v2/mercedez/tags/list
+              """,
+              returnStdout: true
+            ).trim()
+            echo "Response from Nexus: ${response}"
+
+            def newTag = "1.1" // Default tag
+            if (response && response.contains('"tags"')) {
+              def tagsJson = readJSON text: response
+              def tags = tagsJson.tags.findAll { it ==~ /^\d+\.\d+$/ } // Filter numeric tags
+              if (tags && tags.size() > 0) {
+                echo "Tags found: ${tags}"
+                tags = tags.sort { a, b ->
+                  def aParts = a.tokenize('.').collect { it.toInteger() }
+                  def bParts = b.tokenize('.').collect { it.toInteger() }
+                  aParts <=> bParts
                 }
-            }
-        }
+                def latestTag = tags.last()
+                echo "Latest Tag: ${latestTag}"
 
-        stage('Upload to Nexus') {
-            steps {
-                nexusArtifactUploader(
-                    artifacts: [[
-                        artifactId: 'SimpleWebApplication', 
-                        classifier: '', 
-                        file: 'target/SimpleWebApplication.war', 
-                        type: 'war'
-                    ]], 
-                    credentialsId: 'nexus', 
-                    groupId: 'com.maven', 
-                    nexusUrl: '13.233.8.58:8081/', 
-                    nexusVersion: 'nexus3', 
-                    protocol: 'http', 
-                    repository: 'carwebpagemaven', 
-                    version: '1.0.0-SNAPSHOT'
-                )
-            }
-        }
-
-        stage('Download Latest WAR from Nexus, Build image and push back to nexus') {
-            agent {
-                label "docker"
-            }
-            steps {
-                script {
-                    def dockerImageName = "mercedez"
-                    def dockerRepoUrl = "13.233.8.58:5000/repository/mercedezcar/mercedez"
-
-                    stage('Build and Push Docker Image') {
-                        withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                            def newTag = getLatestTag(dockerRepoUrl, DOCKER_USERNAME, DOCKER_PASSWORD)
-                            echo "New Tag to use: ${newTag}"
-
-                            dockerLogin(dockerRepoUrl, DOCKER_USERNAME, DOCKER_PASSWORD)
-                            buildAndPushImage(dockerImageName, newTag, dockerRepoUrl)
-                        }
-                    }
+                // Increment the version number
+                def versionParts = latestTag.tokenize('.')
+                def major = versionParts[0].toInteger()
+                def minor = versionParts[1].toInteger()
+                minor++
+                if (minor == 10) {
+                  major++
+                  minor = 0
                 }
+                newTag = "${major}.${minor}"
+              }
             }
+
+            echo "New Tag to use: ${newTag}"
+
+            // Build and Push Docker Image
+            sh """
+              docker login ${dockerRepoUrl} -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+              docker build -t ${dockerImageName}:${newTag} -f docker/germancar .
+              docker tag ${dockerImageName}:${newTag} ${dockerRepoUrl}:${newTag}
+              docker push ${dockerRepoUrl}:${newTag}
+            """
+          }
         }
+      }
     }
+  }
 }
-
-def getLatestTag(dockerRepoUrl, username, password) {
-    def response = sh(
-        script: """
-            curl -u ${username}:${password} -s \
-            ${dockerRepoUrl}/v2/mercedez/tags/list
-        """,
-        returnStdout: true
-    ).trim()
-
-    def latestTag = "1.1" // Default tag (fallback) in case no tags are found
-
-    if (response && response.contains('"tags"')) {
-        def tagsJson = readJSON text: response
-        def tags = tagsJson.tags
-        if (tags && tags.size() > 0) {
-            tags = tags.sort { a, b ->
-                def aParts = a.tokenize('.').collect { it.toInteger() }
-                def bParts = b.tokenize('.').collect { it.toInteger() }
-                aParts <=> bParts
-            }
-            latestTag = tags.last()
-            def versionParts = latestTag.tokenize('.')
-            def major = versionParts[0].toInteger()
-            def minor = versionParts[1].toInteger()
-            minor++ // Increment minor version
-            if (minor == 10) {
-                major++
-                minor = 0
-            }
-            latestTag = "${major}.${minor}"
-        }
-    }
-    return latestTag
-}
-
-def dockerLogin(dockerRepoUrl,
