@@ -23,8 +23,8 @@ RUN tar -xvf apache-tomcat-9.0.98.tar.gz && \
 RUN mkdir -p /home/tomcat/tomcat/webapps
 
 # Download the .war file from Nexus with credentials
-RUN curl -u admin:admin -o /home/tomcat/tomcat/webapps/SimpleWebApplication-1.0.0-20250116.140851-1.war \
-    http://13.233.8.58:8081/repository/carwebpagemaven/com/maven/SimpleWebApplication/1.0.0-SNAPSHOT/SimpleWebApplication-1.0.0-20250116.140851-1.war
+RUN curl -u admin:admin -o /home/tomcat/tomcat/webapps/SimpleWebApplication-9.1.14-20250110.095614-1.war \
+    http://13.233.8.58:8081/repository/carwebpagemaven/com/maven/SimpleWebApplication/9.1.14-SNAPSHOT/SimpleWebApplication-9.1.14-20250110.095614-1.war
 
 # Switch to tomcat user
 USER tomcat
