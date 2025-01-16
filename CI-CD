@@ -135,7 +135,7 @@ pipeline {
 			// Set the new tag
 			newTag = "${major}.${minor}"
 		        } else {
-		            echo "No tags found in the repository. Using default tag 0.1."
+		            echo "No tags found in the repository. Using default tag 1.1."
 		        }
 		    } else {
 		        echo "Error fetching tags from Nexus."
@@ -144,7 +144,7 @@ pipeline {
 		    echo "New Tag to use: ${newTag}"
 	        echo "Building and pushing the Docker image with tag ${newTag}..."
 	        sh """
-	            docker build -t ${dockerImageName}:${newTag} -f docker/Dockerfile docker
+	            docker build -t ${dockerImageName}:${newTag} -f docker/mercedez
 	            docker tag ${dockerImageName}:${newTag} ${dockerRepoUrl}:${newTag}
 	            docker push ${dockerRepoUrl}:${newTag}
 	        """
