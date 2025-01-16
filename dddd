@@ -52,7 +52,7 @@ pipeline {
           ]], 
           credentialsId: 'nexus', 
           groupId: 'com.maven', 
-          nexusUrl: '13.233.8.58:8081/', 
+          nexusUrl: '13.232.29.33:8081/', 
           nexusVersion: 'nexus3', 
           protocol: 'http', 
           repository: 'carwebpagemaven', 
@@ -68,7 +68,7 @@ pipeline {
         steps {
             script {
                 def dockerImageName = "benzcarpage"
-                def dockerRepoUrl = "13.233.8.58:5000/repository/benzcarweb/benzcarpage"
+                def dockerRepoUrl = "13.232.29.33:5000/repository/benzcarweb/benzcarpage"
 
                 withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 
