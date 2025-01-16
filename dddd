@@ -61,67 +61,75 @@ pipeline {
       }
     }
 
-    // Stage 5: Build Docker Image and Push to Nexus Repository
     stage('Download Latest WAR from Nexus, Build Docker Image, and Push') {
-      agent {
-        label "docker"
-      }
-      steps {
-        script {
-          def dockerImageName = "mercedez"
-          def dockerRepoUrl = "13.233.8.58:5000/repository/mercedezcar/mercedez"
-
-          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-
-            // Fetch existing tags from Nexus
-            def response = sh(
-              script: """
-                curl -u $DOCKER_USERNAME:$DOCKER_PASSWORD -s \
-                ${dockerRepoUrl}/v2/mercedez/tags/list
-              """,
-              returnStdout: true
-            ).trim()
-            echo "Response from Nexus: ${response}"
-
-            def newTag = "1.1" // Default tag
-            if (response && response.contains('"tags"')) {
-              def tagsJson = readJSON text: response
-              def tags = tagsJson.tags.findAll { it ==~ /^\d+\.\d+$/ } // Filter numeric tags
-              if (tags && tags.size() > 0) {
-                echo "Tags found: ${tags}"
-                tags = tags.sort { a, b ->
-                  def aParts = a.tokenize('.').collect { it.toInteger() }
-                  def bParts = b.tokenize('.').collect { it.toInteger() }
-                  aParts <=> bParts
-                }
-                def latestTag = tags.last()
-                echo "Latest Tag: ${latestTag}"
-
-                // Increment the version number
-                def versionParts = latestTag.tokenize('.')
-                def major = versionParts[0].toInteger()
-                def minor = versionParts[1].toInteger()
-                minor++
-                if (minor == 10) {
-                  major++
-                  minor = 0
-                }
-                newTag = "${major}.${minor}"
-              }
-            }
-
-            echo "New Tag to use: ${newTag}"
-
-            // Build and Push Docker Image
-            sh """
-              docker login ${dockerRepoUrl} -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-              docker build -t ${dockerImageName}:${newTag} -f docker/germancar .
-              docker tag ${dockerImageName}:${newTag} ${dockerRepoUrl}:${newTag}
-              docker push ${dockerRepoUrl}:${newTag}
-            """
-          }
+        agent {
+            label "docker"
         }
-      }
+        steps {
+            script {
+                def dockerImageName = "mercedez"
+                def dockerRepoUrl = "13.233.8.58:5000/repository/mercedezcar/mercedez"
+
+                withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+
+                    // Fetch existing tags from Nexus
+                    def response = sh(
+                        script: """
+                            curl -u $DOCKER_USERNAME:$DOCKER_PASSWORD -s \
+                            ${dockerRepoUrl}/v2/mercedez/tags/list
+                        """,
+                        returnStdout: true
+                    ).trim()
+                    echo "Response from Nexus: ${response}"
+
+                    def newTag = "1.1" // Default tag
+                    if (response && response.contains('"tags"')) {
+                        def tagsJson = readJSON text: response
+                        def tags = tagsJson.tags.findAll { it ==~ /^\d+\.\d+$/ } // Filter numeric tags
+                        if (tags && tags.size() > 0) {
+                            echo "Tags found: ${tags}"
+                            tags = tags.sort { a, b ->
+                                def aParts = a.tokenize('.').collect { it.toInteger() }
+                                def bParts = b.tokenize('.').collect { it.toInteger() }
+                                aParts <=> bParts
+                            }
+                            def latestTag = tags.last()
+                            echo "Latest Tag: ${latestTag}"
+
+                            // Increment the version number
+                            try {
+                                def versionParts = latestTag.tokenize('.')
+                                def major = versionParts[0].toInteger()
+                                def minor = versionParts[1].toInteger()
+                                minor++
+                                if (minor == 10) {
+                                    major++
+                                    minor = 0
+                                }
+                                newTag = "${major}.${minor}"
+                            } catch (Exception e) {
+                                echo "Error incrementing version number: ${e.message}"
+                                newTag = "1.1" // Default to a known good version
+                            }
+                        }
+                    }
+
+                    echo "New Tag to use: ${newTag}"
+
+                    // Build and Push Docker Image
+                    try {
+                        sh """
+                            docker login ${dockerRepoUrl} -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+                            docker build -t ${dockerImageName}:${newTag} -f docker/germancar .
+                            docker tag ${dockerImageName}:${newTag} ${dockerRepoUrl}:${newTag}
+                            docker push ${dockerRepoUrl}:${newTag}
+                        """
+                    } catch (Exception e) {
+                        echo "Error building or pushing Docker image: ${e.message}"
+                        throw e // Re-throw the exception to fail the pipeline
+                    }
+                }
+            }
+        }
     }
-  }
 }
