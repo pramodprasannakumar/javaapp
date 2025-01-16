@@ -76,7 +76,7 @@ pipeline {
     steps {
 	script {
 	    def dockerImageName = "mercedez"
-	    def dockerRepoUrl = "http://13.233.8.58:5000/repository/mercedezcar/mercedez"
+	    def dockerRepoUrl = "13.233.8.58:5000/repository/mercedezcar/mercedez"
 	    def dockerUsername = "admin"  // Your Nexus username
 	    def dockerPassword = "admin"  // Your Nexus password
 	
