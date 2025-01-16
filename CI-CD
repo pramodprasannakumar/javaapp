@@ -146,7 +146,7 @@ pipeline {
 		 withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 	        sh """
 		    docker login ${dockerRepoUrl} -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-	            docker build -t ${dockerImageName}:${newTag} -f docker/mercedez .
+	            docker build -t ${dockerImageName}:${newTag} -f docker/germancar .
 	            docker tag ${dockerImageName}:${newTag} ${dockerRepoUrl}:${newTag}
 	            docker push ${dockerRepoUrl}:${newTag}
 	        """
