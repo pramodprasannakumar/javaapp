@@ -67,8 +67,8 @@ pipeline {
         }
         steps {
             script {
-                def dockerImageName = "mercedez"
-                def dockerRepoUrl = "13.233.8.58:5000/repository/mercedezcar/mercedez"
+                def dockerImageName = "benzcarpage"
+                def dockerRepoUrl = "13.233.8.58:5000/repository/benzcarweb/benzcarpage"
 
                 withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 
@@ -76,7 +76,7 @@ pipeline {
                     def response = sh(
                         script: """
                             curl -u $DOCKER_USERNAME:$DOCKER_PASSWORD -s \
-                            ${dockerRepoUrl}/v2/mercedez/tags/list
+                            ${dockerRepoUrl}/v2/benzcarpage/tags/list
                         """,
                         returnStdout: true
                     ).trim()
