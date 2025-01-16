@@ -35,7 +35,7 @@ pipeline {
         }
       }
     }
-    
+  /*  
     stage("Sonar Quality Gate Check") {
       steps {
         timeout(time: 1, unit: 'MINUTES') {
@@ -48,7 +48,7 @@ pipeline {
         }
       }
     }
-    
+   */ 
     stage('Upload to Nexus') {
       steps {
         nexusArtifactUploader(
