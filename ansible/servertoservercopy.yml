@@ -23,12 +23,15 @@
 
 
 
+1>servers are up and running command to check?
+
+ansible all -m ping
 
 
 
 
 
-ansible playbook for copying file from one server to another???
+2>ansible playbook for copying file from one server to another???
 
 
 
