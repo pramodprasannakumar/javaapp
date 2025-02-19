@@ -1,0 +1,74 @@
+---
+- name: Copy file from one server to another
+  hosts: source_server
+  tasks:
+    - name: Fetch the file from source server
+      fetch:
+        src: /path/to/source/file.txt
+        dest: /tmp/file.txt
+        flat: yes
+
+- name: Transfer file to destination server
+  hosts: destination_server
+  tasks:
+    - name: Copy the file to destination server
+      copy:
+        src: /tmp/file.txt
+        dest: /path/to/destination/file.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+ansible playbook for copying file from one server to another???
+
+
+
+Here’s a simple Ansible playbook to copy a file from one server to another using the fetch and copy modules.
+
+Steps:
+Fetch the file from the source server.
+Copy it to the destination server.
+Playbook: copy_file.yml
+yaml
+Copy
+Edit
+---
+- name: Copy file from one server to another
+  hosts: source_server
+  tasks:
+    - name: Fetch the file from source server
+      fetch:
+        src: /path/to/source/file.txt
+        dest: /tmp/file.txt
+        flat: yes
+
+- name: Transfer file to destination server
+  hosts: destination_server
+  tasks:
+    - name: Copy the file to destination server
+      copy:
+        src: /tmp/file.txt
+        dest: /path/to/destination/file.txt
+Inventory File (inventory.ini):
+ini
+Copy
+Edit
+[source_server]
+source ansible_host=<source_IP> ansible_user=<user> ansible_ssh_private_key_file=<path_to_ssh_key>
+
+[destination_server]
+destination ansible_host=<destination_IP> ansible_user=<user> ansible_ssh_private_key_file=<path_to_ssh_key>
+Run the Playbook:
+sh
+Copy
+Edit
+ansible-playbook -i inventory.ini copy_file.yml
